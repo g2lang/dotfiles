@@ -32,3 +32,7 @@ id_ed25519
 *.p12
 *.pfx
 *.agekey
+
+# Only the managed SSH client defaults belong in this directory.
+.ssh/*
+!.ssh/config

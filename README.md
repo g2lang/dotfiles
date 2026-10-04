@@ -6,7 +6,7 @@ Gabe's laptop and Home Manager configuration, separate from CXF. The Git remote 
 
 - `hosts/dev-laptop/`: NixOS configuration and the existing hardware configuration.
 - `home.nix`: Home Manager module.
-- `.zshrc` and `.config/`: managed dotfiles, mirroring their locations in your home.
+- `.zshrc`, `.config/`, and `.ssh/config`: managed dotfiles, mirroring their locations in your home.
 - `tests/`: terminal and Neovim configuration regression tests.
 - [Terminal guide](docs/terminal.md): controls, appearance, and personal overrides.
 
@@ -33,6 +33,32 @@ Use an explicit `--flake`: the old installation-time files in `/etc/nixos` are n
 The `path:` form works even before the new repository has an initial commit or tracked files. It includes untracked source files; review them before rebuilding. A normal Git-based flake reference such as `.#dev-laptop` requires the intended source files to be tracked.
 
 After activation, open a new shell, reload tmux with prefix-r, and reload Ghostty with Ctrl-Alt-R. Ghostty padding geometry changes require a new window or tab. If an existing shell exports `STARSHIP_CONFIG` pointing into CXF, the old checkout location, or the old nested layout, unset it to use the installed config, or set it to `$HOME/Projects/dotfiles/.config/starship.toml`.
+
+## SSH client configuration
+
+Home Manager manages only `~/.ssh/config`, not the whole SSH directory. Its
+versioned source includes `~/.ssh/config.local` before shared defaults, so private
+host entries and per-host overrides remain writable and outside this published
+repository. The local file is optional; it is not created by Home Manager on a
+new machine.
+
+Private keys, public-key files, `known_hosts`, and `config.local` remain in the
+actual `~/.ssh/`. Do not copy keys into this checkout or reference their contents
+from Nix: ignored files can still enter the store through a `path:` flake. The
+repository's `.ssh/` allowlist admits only `config` to Git. GNOME supplies the SSH
+agent; do not enable a competing agent or start one in each shell.
+
+Before the first activation, an existing regular `~/.ssh/config` must be moved
+to an **unused backup filename**, after preserving its host entries in
+`~/.ssh/config.local`. Move only that configuration file, never the directory or
+its keys. Then use the normal laptop rebuild above. Home Manager will refuse a
+conflicting file rather than overwrite it. No forced replacement is configured.
+
+Preview the proposed configuration without connecting or activating:
+
+```bash
+ssh -G -F /home/gabe/Projects/dotfiles/.ssh/config HOST_ALIAS
+```
 
 ## Check changes
 

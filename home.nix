@@ -101,6 +101,8 @@
 
   home.file = {
     ".zshrc".source = ./.zshrc;
+    # Manage only client defaults; keys and private host entries stay in ~/.ssh.
+    ".ssh/config".source = ./.ssh/config;
     ".config/starship.toml".source = ./.config/starship.toml;
     ".config/zsh/plugins/zsh-autosuggestions.zsh".source =
       "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh";
