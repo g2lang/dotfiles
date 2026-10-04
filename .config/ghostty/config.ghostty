@@ -1,0 +1,36 @@
+# Match Neovim, tmux, and the shell; keep text opaque and readable.
+theme = Catppuccin Mocha
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+# Extend edge backgrounds, but retain vertical safeguards for Powerline rows.
+# Padding geometry changes require a new terminal window/tab after reloading.
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = true
+window-padding-color = extend
+window-theme = dark
+mouse-hide-while-typing = true
+scrollback-limit = 20000000
+
+# Preserve Ghostty's native TERM and keyboard protocol. The SSH integration
+# falls back to xterm-256color remotely without installing files on the host.
+shell-integration = detect
+shell-integration-features = cursor,title,ssh-env,no-ssh-terminfo
+window-inherit-working-directory = true
+
+# tmux can write selections through OSC 52; clipboard reads still require consent.
+clipboard-read = ask
+clipboard-write = allow
+clipboard-paste-protection = true
+confirm-close-surface = true
+
+# Ctrl-Enter belongs to terminal applications (including pi), not fullscreen.
+# Native copy/paste, search, tabs, splits, and the command palette remain intact.
+keybind = ctrl+enter=unbind
+keybind = ctrl+shift+enter=unbind
+keybind = ctrl+alt+f=toggle_fullscreen
+keybind = ctrl+alt+z=toggle_split_zoom
+keybind = ctrl+alt+r=reload_config
+
+# Personal overrides are optional and remain writable outside the managed file.
+config-file = ?local.ghostty

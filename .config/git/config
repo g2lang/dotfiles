@@ -1,0 +1,34 @@
+[user]
+    name = Gabe Langlais
+    email = gabe@langla.is
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[fetch]
+    prune = true
+
+[push]
+    autoSetupRemote = true
+
+[rebase]
+    autoStash = true
+
+[merge]
+    conflictstyle = zdiff3
+
+[diff]
+    algorithm = histogram
+    colorMoved = default
+
+[core]
+    editor = nvim
+
+[alias]
+    st = status
+    lg = log --graph --decorate --oneline --all
+    last = log -1 HEAD --stat
+    unstage = restore --staged

@@ -1,0 +1,34 @@
+.direnv/
+__pycache__/
+*.py[cod]
+result
+result-*
+
+# Local authentication state.
+**/.config/gh/hosts.yml
+.git-credentials
+.netrc
+
+# Personal overrides, separate from managed configuration.
+.zshrc.local
+**/.config/ghostty/local.ghostty
+**/.config/tmux/local.conf
+
+# Local environment values; sanitized templates may be committed.
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Key material and common key-container formats.
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+**/.ssh/id_*
+!**/.ssh/*.pub
+*.key
+*.pem
+*.p12
+*.pfx
+*.agekey

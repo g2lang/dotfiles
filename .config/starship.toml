@@ -1,0 +1,110 @@
+# Deliberately small: no per-language version probes on every prompt.
+add_newline = true
+command_timeout = 500
+scan_timeout = 30
+palette = 'mocha'
+# Flat outer edges; only the clock's inner boundary is rounded.
+format = '[ ](bg:surface)($username$hostname[ ](bg:surface))$directory$git_branch$git_commit$git_status$cmd_duration$jobs$fill$time$line_break$character'
+right_format = ''
+
+[palettes.mocha]
+blue = '#89b4fa'
+red = '#f38ba8'
+yellow = '#f9e2af'
+subtext = '#a6adc8'
+text = '#cdd6f4'
+# Only slightly lighter than Ghostty's Mocha background: a divider, not a beam.
+surface = '#252536'
+clock_surface = '#313244'
+muted = '#6c7086'
+
+[username]
+show_always = false
+style_user = 'fg:subtext bg:surface'
+style_root = 'bold fg:red bg:surface'
+format = '[$user]($style)'
+
+[hostname]
+ssh_only = true
+format = '[@$hostname](fg:subtext bg:surface)'
+
+[directory]
+# Keep the full home-relative path, including the parents of a Git checkout.
+truncation_length = 0
+truncate_to_repo = false
+home_symbol = '~'
+style = 'fg:text bg:surface'
+before_repo_root_style = 'fg:subtext bg:surface'
+repo_root_style = 'fg:text bg:surface'
+read_only = ' [read-only]'
+read_only_style = 'fg:red bg:surface'
+# Include trailing spaces in the background, both inside and outside Git.
+format = '[$path]($style)[$read_only]($read_only_style)[ ](bg:surface)'
+repo_root_format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style)[ ](bg:surface)'
+
+# Modules share a background, separated only by quiet vertical rules.
+# Each module sets it explicitly; top-level styles do not propagate into modules.
+[git_branch]
+symbol = ' '
+only_attached = true
+format = '[│](fg:muted bg:surface)[ $symbol$branch(:$remote_branch) ](fg:blue bg:surface)'
+
+[git_commit]
+only_detached = true
+commit_hash_length = 7
+format = '[│](fg:muted bg:surface)[ @$hash ](fg:blue bg:surface)'
+
+[git_status]
+# Quiet text labels, like lualine/tmux, rather than an icon for every counter.
+# + added; ~ modified; - deleted; r renamed; t type changed.
+# Explicit index/worktree fields avoid the incomplete legacy "staged" counter.
+# Counts describe file states, not lines; the same file can occur in both groups.
+# Each nonempty category brings its own muted separator, not another capsule.
+format = '([│](fg:muted bg:surface)[ staged$index_added$index_modified$index_deleted$index_typechanged$renamed ](fg:subtext bg:surface))([│](fg:muted bg:surface)[ work$worktree_added$worktree_modified$worktree_deleted$worktree_typechanged ](fg:subtext bg:surface))$untracked$conflicted$stashed$ahead_behind'
+index_added = ' +${count}'
+index_modified = ' ~${count}'
+index_deleted = ' -${count}'
+index_typechanged = ' t${count}'
+renamed = ' r${count}'
+worktree_added = ' +${count}'
+worktree_modified = ' ~${count}'
+worktree_deleted = ' -${count}'
+worktree_typechanged = ' t${count}'
+untracked = '[│](fg:muted bg:surface)[ new ${count} ](fg:subtext bg:surface)'
+stashed = '[│](fg:muted bg:surface)[ stash ${count} ](fg:subtext bg:surface)'
+conflicted = '[│](fg:muted bg:surface)[ conflict ${count} ](bold fg:red bg:surface)'
+ahead = '[│](fg:muted bg:surface)[ ↑${count} ](fg:subtext bg:surface)'
+behind = '[│](fg:muted bg:surface)[ ↓${count} ](fg:subtext bg:surface)'
+diverged = '[│](fg:muted bg:surface)[ ↑${ahead_count} ↓${behind_count} ](fg:subtext bg:surface)'
+up_to_date = ''
+
+[cmd_duration]
+min_time = 10000
+format = '[│](fg:muted bg:surface)[ $duration ](fg:subtext bg:surface)'
+
+[jobs]
+symbol = 'jobs:'
+number_threshold = 1
+format = '[│](fg:muted bg:surface)[ $symbol$number ](fg:subtext bg:surface)'
+
+# Native, width-aware padding with no bright line or extra subprocess.
+# If context exceeds the terminal width, padding shrinks and text can wrap.
+[fill]
+symbol = ' '
+style = 'bg:surface'
+
+# A muted clock bubble ends the context row, flush with the right edge.
+# It records prompt-render time; tmux provides the continuously refreshed clock.
+[time]
+disabled = false
+time_format = '%H:%M'
+format = '[](fg:clock_surface bg:surface)[ $time ]($style)'
+style = 'fg:subtext bg:clock_surface'
+
+[character]
+success_symbol = '[❯](subtext)'
+error_symbol = '[❯](bold red)'
+vimcmd_symbol = '[❮](blue)'
+vimcmd_replace_one_symbol = '[❮](yellow)'
+vimcmd_replace_symbol = '[❮](yellow)'
+vimcmd_visual_symbol = '[❮](blue)'
