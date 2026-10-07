@@ -6,6 +6,8 @@ export VISUAL=nvim
 export PAGER=less
 export LESS='-R -F -X'
 
+export PATH=~/.cargo/bin:$PATH
+
 # Keep the existing history location, shared between shells. A leading space
 # opts a command out of history, but is not a substitute for secret handling.
 HISTFILE="$HOME/.zsh_history"
@@ -18,7 +20,7 @@ setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS INTERACTIVE_COMMENTS
 
 # Completion stays local to the user; retain compinit's permission checks.
 autoload -Uz compinit
-if (( ! $+functions[compdef] )); then
+if ((! $+functions[compdef])); then
   typeset _cxf_zsh_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
   if mkdir -p -- "$_cxf_zsh_cache"; then
     compinit -d "$_cxf_zsh_cache/zcompdump-$ZSH_VERSION"
@@ -63,12 +65,12 @@ zle -N edit-command-line
 bindkey -M viins '^X^E' edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
-if (( $+commands[eza] )); then
+if (($+commands[eza])); then
   alias ls='eza --group-directories-first'
   alias ll='eza -lah --group-directories-first'
   alias la='eza -a --group-directories-first'
 fi
-(( $+commands[rg] )) && alias grep='rg'
+(($+commands[rg])) && alias grep='rg'
 alias gs='git status'
 alias gd='git diff'
 alias gl='git log --oneline --graph --decorate'
@@ -77,7 +79,7 @@ alias ...='cd ../..'
 alias v='nvim'
 
 mkcd() {
-  if (( $# != 1 )); then
+  if (($# != 1)); then
     print -u2 'usage: mkcd <directory>'
     return 2
   fi
@@ -94,18 +96,18 @@ croot() {
 }
 
 # Native integrations rather than a shell framework or runtime plugin manager.
-(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
-if (( $+commands[fzf] )); then
+(($+commands[zoxide])) && eval "$(zoxide init zsh)"
+if (($+commands[fzf])); then
   export FZF_DEFAULT_OPTS='--height=45% --layout=reverse --border=rounded --color=bg+:#313244,fg:#cdd6f4,fg+:#cdd6f4,hl:#f38ba8,hl+:#f38ba8,pointer:#cba6f7,prompt:#89b4fa,info:#a6adc8'
-  if (( $+commands[fd] )); then
+  if (($+commands[fd])); then
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
   fi
-  if (( $+commands[bat] )); then
+  if (($+commands[bat])); then
     export FZF_CTRL_T_OPTS='--preview "bat --color=always --style=numbers --line-range=:200 -- {}" --preview-window=right:55%:wrap'
   fi
-  if (( $+commands[eza] )); then
+  if (($+commands[eza])); then
     export FZF_ALT_C_OPTS='--preview "eza --tree --level=2 --color=always -- {}"'
   fi
   source <(fzf --zsh)
@@ -123,8 +125,8 @@ fi
 
 # A dependency-free fallback also works before Home Manager is activated.
 PROMPT='%F{blue}%n@%m%f:%F{cyan}%~%f %# '
-(( $+commands[starship] )) && eval "$(starship init zsh)"
-(( $+commands[direnv] )) && eval "$(direnv hook zsh)"
+(($+commands[starship])) && eval "$(starship init zsh)"
+(($+commands[direnv])) && eval "$(direnv hook zsh)"
 
 # Personal additions stay outside the managed file. Highlighting loads last so
 # it can observe widgets installed by integrations and local customizations.
