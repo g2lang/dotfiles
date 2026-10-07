@@ -74,6 +74,8 @@
     vscode-langservers-extracted
 
     # General CLI/desktop packages.
+    zed-editor
+    codex
     tmux
     zsh
     starship
