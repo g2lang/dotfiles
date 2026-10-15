@@ -74,6 +74,7 @@
     vscode-langservers-extracted
 
     # General CLI/desktop packages.
+    obsidian
     zed-editor
     codex
     tmux
