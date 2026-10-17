@@ -8,6 +8,13 @@ export LESS='-R -F -X'
 
 export PATH=~/.cargo/bin:$PATH
 
+# Load optional BWS credentials from outside the checkout.
+if [[ -r "$HOME/.bws" ]]; then
+  set -a
+  source "$HOME/.bws"
+  set +a
+fi
+
 # Keep the existing history location, shared between shells. A leading space
 # opts a command out of history, but is not a substitute for secret handling.
 HISTFILE="$HOME/.zsh_history"

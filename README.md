@@ -34,6 +34,45 @@ The `path:` form works even before the new repository has an initial commit or t
 
 After activation, open a new shell, reload tmux with prefix-r, and reload Ghostty with Ctrl-Alt-R. Ghostty padding geometry changes require a new window or tab. If an existing shell exports `STARSHIP_CONFIG` pointing into CXF, the old checkout location, or the old nested layout, unset it to use the installed config, or set it to `$HOME/Projects/dotfiles/.config/starship.toml`.
 
+## Orca package and updates
+
+`pkgs/orca-ide.nix` pins the official stablyai Orca x86-64 Linux AppImage,
+not the GNOME screen reader (`pkgs.orca`). The initial pin is 1.4.229.
+The package is exposed as `packages.x86_64-linux.orca-ide` and included in
+`home.packages` in `home.nix`. Activate with `just switch`, then launch **Orca**
+from GNOME's application menu or run `orca-ide`. The package includes the upstream
+desktop entry and icons; it does not replace GNOME's `orca` screen-reader command.
+
+```bash
+just update-orca          # Latest stable GitHub release
+just update-orca 1.4.229  # Explicit stable version (also accepts v1.4.229)
+just test-update-orca     # Offline updater regression tests
+```
+
+The updater fetches release metadata, downloads the selected AppImage into the
+Nix store, and verifies its SHA-256 against GitHub's published asset digest before
+atomically changing only the package's version and checksum. An unchanged pin is
+a no-op; missing assets/digests, failed downloads, and checksum mismatches leave
+the file untouched. Network access is required; GitHub API rate limits can cause
+a failure. It never updates `flake.lock`, builds the application/system, activates
+a generation, runs the AppImage, or commits changes. `nix develop` may realize the
+pinned development shell used to run the updater.
+
+Review and optionally build the package independently:
+
+```bash
+git diff -- pkgs/orca-ide.nix
+# Until the new package file is tracked, inspect it directly or use just status.
+nix build "path:$PWD#orca-ide" --no-write-lock-file --no-link
+```
+
+After updating the pin, use `just check`, `just diff`, and `just switch` to validate,
+build, and activate it. Quit Orca before switching and reopen it afterward. Keep
+updates Nix-managed rather than using an in-app installer. Back up Orca's mutable
+state before significant upgrades: reverting the package pin and rebuilding
+restores the executable, not database migrations. Agent logins and Orca's mutable
+state remain outside Git and Home Manager's managed files.
+
 ## SSH client configuration
 
 Home Manager manages only `~/.ssh/config`, not the whole SSH directory. Its
@@ -62,7 +101,31 @@ ssh -G -F /home/gabe/Projects/dotfiles/.ssh/config HOST_ALIAS
 
 ## Check changes
 
-From this repository's root:
+Use `just` to list the available workflows. Recipes run from the checkout root,
+even when called from a subdirectory, and use `path:` flake references so edits
+and new source files are available immediately without staging them. As with the
+rebuild command above, keep credentials and private files outside the checkout.
+
+```bash
+just status         # Review existing changes and untracked files
+just check          # Fast whitespace, shell syntax, and Nix evaluation checks
+just test-terminal  # Focused terminal regression tests
+just test-nvim      # Focused Neovim regression test
+just verify         # Run checks and both test suites
+just plan           # Preview required builds and downloads
+just build          # Build NixOS + Home Manager into ./result
+just diff           # Build and compare packages against the running system
+just switch         # Activate and set the boot default (uses sudo)
+```
+
+`just boot` selects a configuration for the next reboot. `just shell` opens the
+pinned development environment; `just run COMMAND ARGS...` runs a single command
+inside it. Validation and build recipes do not activate changes or update the
+lock file. The default flake host is `dev-laptop`; override it with
+`DOTFILES_HOST=OTHER_HOST just build` when adding another configuration.
+
+The equivalent test commands can also be run directly
+from this repository's root:
 
 ```bash
 nix flake check "path:$PWD" --no-build --no-write-lock-file

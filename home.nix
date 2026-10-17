@@ -74,7 +74,10 @@
     vscode-langservers-extracted
 
     # General CLI/desktop packages.
+    (pkgs.callPackage ./pkgs/orca-ide.nix { })
+    bws
     obsidian
+    code-cursor
     zed-editor
     codex
     tmux

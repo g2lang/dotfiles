@@ -28,6 +28,9 @@
         ];
       };
 
+      # Also available to build independently of the Home Manager installation.
+      packages.${system}.orca-ide = pkgs.callPackage ./pkgs/orca-ide.nix { };
+
       # Configuration checks are independent of CXF's development environment.
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [

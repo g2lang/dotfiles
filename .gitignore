@@ -5,6 +5,7 @@ result
 result-*
 
 # Local authentication state.
+.bws
 **/.config/gh/hosts.yml
 .git-credentials
 .netrc
