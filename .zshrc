@@ -73,6 +73,7 @@ bindkey -M viins '^X^E' edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
 if (($+commands[eza])); then
+  alias l='eza -lAhF --group-directories-first --short-nix --time-style=long-iso'
   alias ls='eza --group-directories-first'
   alias ll='eza -lah --group-directories-first'
   alias la='eza -a --group-directories-first'
@@ -91,6 +92,14 @@ mkcd() {
     return 2
   fi
   mkdir -p -- "$1" && builtin cd -- "$1"
+}
+
+mz() {
+  if (($# != 1)); then
+    print -u2 'usage: mz <directory>'
+    return 2
+  fi
+  mkdir -p -- "$1" && z -- "$1"
 }
 
 croot() {

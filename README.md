@@ -5,7 +5,8 @@ Gabe's laptop and Home Manager configuration, separate from CXF. The Git remote 
 ## Layout
 
 - `hosts/dev-laptop/`: NixOS configuration and the existing hardware configuration.
-- `home.nix`: Home Manager module.
+- `home.nix`: Home Manager module; `modules/agents.nix` manages shared agent files.
+- `.agents/`: shared personal instructions and declarative skills ([agent guide](docs/agents.md)).
 - `.zshrc`, `.config/`, and `.ssh/config`: managed dotfiles, mirroring their locations in your home.
 - `tests/`: terminal and Neovim configuration regression tests.
 - [Terminal guide](docs/terminal.md): controls, appearance, and personal overrides.
@@ -73,6 +74,21 @@ state before significant upgrades: reverting the package pin and rebuilding
 restores the executable, not database migrations. Agent logins and Orca's mutable
 state remain outside Git and Home Manager's managed files.
 
+## Shared agent configuration
+
+`.agents/AGENTS.md` supplies personal instructions at `~/.agents/AGENTS.md`.
+Pi's `~/.pi/agent/AGENTS.md` and Codex's `~/.codex/AGENTS.md` are aliases pointing
+to that canonical installed file. Both agents discover `~/.agents/skills/`
+natively; Home Manager installs each skill directory in `.agents/skills/`
+individually, leaving existing unrelated skills writable and unmanaged.
+
+To manage a new skill, add `.agents/skills/<name>/SKILL.md` and any supporting
+files, run `just test-agents` and `just check`, then activate when ready with
+`just switch`. Edit managed files here, not through their installed symlinks.
+No authentication, sessions, installer state, or mutable agent settings are
+managed. See the [agent guide](docs/agents.md) for migration, conflicts,
+third-party skills, and adding another agent.
+
 ## SSH client configuration
 
 Home Manager manages only `~/.ssh/config`, not the whole SSH directory. Its
@@ -111,7 +127,8 @@ just status         # Review existing changes and untracked files
 just check          # Fast whitespace, shell syntax, and Nix evaluation checks
 just test-terminal  # Focused terminal regression tests
 just test-nvim      # Focused Neovim regression test
-just verify         # Run checks and both test suites
+just test-agents    # Shared instructions, skill metadata, and Home Manager wiring
+just verify         # Run checks and all test suites
 just plan           # Preview required builds and downloads
 just build          # Build NixOS + Home Manager into ./result
 just diff           # Build and compare packages against the running system

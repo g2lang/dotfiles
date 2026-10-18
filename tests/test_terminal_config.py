@@ -161,6 +161,52 @@ class TerminalConfigTests(unittest.TestCase):
         self.assertIn("INTERACTIVE_OK", result.stdout)
         self.assertEqual(result.stderr, "")
 
+    @unittest.skipUnless(shutil.which("eza"), "eza is not installed")
+    def test_l_alias_abbreviates_nix_store_targets(self):
+        self.prepare_zsh()
+        # eza only abbreviates valid targets; use the installed Nix executable.
+        target = str(Path(shutil.which("eza")).resolve())
+        match = re.match(r"/nix/store/([a-z0-9]{32})(-.*)", target)
+        if not match:
+            self.skipTest("eza is not installed in the Nix store")
+        fingerprint, suffix = match.groups()
+        (self.work / ".example").symlink_to(target)
+        result = self.command("zsh", "-d", "-i", "-c", "l --color=never")
+        self.assertIn(".example", result.stdout)
+        self.assertIn(f"/nix/store/{fingerprint[:8]}…{suffix}", result.stdout)
+        self.assertNotIn(fingerprint, result.stdout)
+        self.assertEqual(result.stderr, "")
+
+    @unittest.skipUnless(shutil.which("zoxide"), "zoxide is not installed")
+    def test_mz_creates_and_enters_exact_directory(self):
+        self.prepare_zsh()
+        result = self.command(
+            "zsh",
+            "-d",
+            "-i",
+            "-c",
+            """
+            root=$PWD
+            mz "nested/directory with spaces" || exit 1
+            [[ $PWD == "$root/nested/directory with spaces" ]] || exit 2
+            [[ $(zoxide query -- 'directory with spaces') == "$PWD" ]] || exit 3
+            mz --literal || exit 4
+            [[ $PWD == "$root/nested/directory with spaces/--literal" ]] || exit 5
+            mz . || exit 6
+            before=$PWD
+            mz >/dev/null 2>&1
+            [[ $? == 2 ]] || exit 7
+            mz one two >/dev/null 2>&1
+            [[ $? == 2 ]] || exit 8
+            touch blocker
+            mz blocker/child >/dev/null 2>&1 && exit 9
+            [[ $PWD == "$before" && ! -e one && ! -e two ]] || exit 10
+            print MZ_OK
+        """,
+        )
+        self.assertIn("MZ_OK", result.stdout)
+        self.assertEqual(result.stderr, "")
+
     def test_croot_handles_worktrees_and_failure(self):
         self.prepare_zsh()
         self.command("git", "init", "--quiet")

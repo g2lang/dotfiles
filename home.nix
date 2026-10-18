@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  imports = [ ./modules/agents.nix ];
+
   home.username = "gabe";
   home.homeDirectory = "/home/gabe";
   home.stateVersion = "26.05";

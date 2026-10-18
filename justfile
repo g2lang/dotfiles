@@ -32,7 +32,7 @@ evaluate:
 
 # Run all regression suites against the working tree in the pinned environment.
 test:
-    nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command bash -euc 'python3 tests/test_terminal_config.py; python3 tests/test_nvim_completion.py; python3 -B tests/test_update_orca.py'
+    nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command bash -euc 'python3 tests/test_terminal_config.py; python3 tests/test_nvim_completion.py; python3 -B tests/test_update_orca.py; python3 -B tests/test_agent_config.py'
 
 # Test shell, tmux, prompt, and terminal configuration in isolated temporary homes.
 test-terminal:
@@ -45,6 +45,10 @@ test-nvim:
 # Test the Orca updater offline, without downloads or changes to the package pin.
 test-update-orca:
     nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command python3 -B tests/test_update_orca.py
+
+# Validate shared instructions, skill metadata, and Home Manager wiring.
+test-agents:
+    nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command python3 -B tests/test_agent_config.py
 
 # Pin the latest stable Orca (or a specific version); never build or activate it.
 update-orca version="latest":
