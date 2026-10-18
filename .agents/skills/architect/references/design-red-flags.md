@@ -1,6 +1,6 @@
 # Design red flags
 
-Screen every candidate before synthesis. A red flag is a reason to revise or reject the shape.
+Screen every candidate before synthesis. A red flag is a reason to inspect the tradeoff, not an automatic requirement to revise the shape. Project contracts and demonstrated behavior take precedence.
 
 ## Shallow module
 
@@ -30,7 +30,7 @@ Group code around domain knowledge and ownership. Methods that run at different 
 
 A pass-through method forwards the same arguments to another method with the same shape. It adds a layer without hiding complexity.
 
-Remove it or move responsibility to the module that can complete the operation. Keep a forwarding boundary only when it adds policy, adaptation, or a distinct abstraction.
+Remove it only when it adds no policy, adaptation, resource ownership, or useful isolation. A single caller does not invalidate those reasons.
 
 ## Split ownership
 
@@ -42,13 +42,13 @@ Give each piece of state one owner. Other modules read it or ask the owner to ch
 
 The design supports more than one way to do the same task. An agent copies whichever way it finds first, so every way keeps gaining callers.
 
-Keep one way. Move callers off the others and delete them in the same change.
+Prefer one supported way when the alternatives have no distinct purpose. Preserve intentional compatibility paths until their consumers can migrate. Delete an old path only within the approved migration scope.
 
 ## Importable internals
 
 A caller can import a module's internals. An agent takes the shortest path that compiles, so it imports them directly and they become part of the interface.
 
-Make internals unreachable from outside the module, so an import from outside fails the build.
+Use the language's visibility rules to protect internal contracts where practical. Do not add a framework merely to enforce a file-layout preference.
 
 ## Hand-synced list
 

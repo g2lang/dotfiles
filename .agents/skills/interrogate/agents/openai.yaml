@@ -1,0 +1,5 @@
+interface:
+  display_name: "Interrogate"
+  short_description: "Run independent read-only reviews of fixed inputs"
+policy:
+  allow_implicit_invocation: false

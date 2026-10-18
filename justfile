@@ -46,7 +46,7 @@ test-nvim:
 test-update-orca:
     nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command python3 -B tests/test_update_orca.py
 
-# Validate shared instructions, skill metadata, and Home Manager wiring.
+# Validate skill references, invocation policies, metadata, and Home Manager wiring.
 test-agents:
     nix develop "$DOTFILES_FLAKE" --no-write-lock-file --command python3 -B tests/test_agent_config.py
 

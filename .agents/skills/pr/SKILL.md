@@ -3,7 +3,7 @@ name: pr
 description: "Use when writing a PR body."
 ---
 
-Use this template for writing the PR body:
+Use this template for writing the PR body. This skill shapes a description; it does not authorize commits, pushes, PR creation, or merging. Follow the [workflow policy](../orchestration/references/workflow-policy.md).
 
 ```markdown
 ## Summary
@@ -155,7 +155,7 @@ Concrete evidence that the change works. Show a before and after.
 
 Screenshots are S-tier - when the environment is set up for it and the change is visual.
 
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+For nonvisual behavior, prefer executed checks. Show the actual commands and relevant failing-before and passing-after output when available. Label illustrative pseudocode as illustrative, never as executed evidence. State missing baseline evidence or checks that were not run.
 
 ### Merge Danger
 

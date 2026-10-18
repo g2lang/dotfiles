@@ -1,30 +1,16 @@
 ---
 name: grilling
-description: Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.
+description: Interview the user to resolve meaningful open decisions in a plan or design. Use when the user asks to be grilled or to stress-test an idea.
 ---
 
-Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
+# Clarify a design through questions
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+Identify the decisions that must be settled and which depend on others. Work in rounds. Ask only questions whose prerequisites are settled, then wait for the user's answers before proceeding to dependent decisions.
 
-Format a round like so:
+Number each question, state why it matters when that is not obvious, and offer a reasoned recommendation where possible. Use plain text and short paragraphs. Do not force a yes/no answer when the alternatives need explanation.
 
-```
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+Look up facts yourself through focused source inspection or documentation. A routine lookup does not need a worker. Use supervised research only when authorized under the [workflow policy](../orchestration/references/workflow-policy.md). Do not ask the user for facts you can inspect safely, and do not invent facts to keep the interview moving.
 
-➡️ <your recommended answer>
+Keep the discussion within the requested scope. Reuse prior decisions instead of asking them again. Stop when the decisions needed for the next step are resolved or the remaining blockers are explicit. Summarize the agreement and ask for confirmation before implementing behavior that has not already been authorized.
 
----
-
-❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
-
-➡️ <your recommended answer>
-```
-
-Word each question so "yes" accepts your recommended answer.
-
-Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
-
-Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
-
-The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
+A dispatched worker must not start a separate interview. Send unresolved decisions to its coordinator using the live Orca preamble. The coordinator answers within approved scope or asks the user.

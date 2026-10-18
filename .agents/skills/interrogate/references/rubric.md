@@ -33,7 +33,7 @@ Answering this often requires looking beyond the changed files. Read the surroun
 
 Does the code fit well into the system it's part of?
 
-- Boundary discipline: is validation at system boundaries, or scattered through business logic? Validate data once where it enters the system, then trust it internally.
+- Validate untrusted representations where they enter the system. Keep checks for runtime conditions that can change, such as lease ownership, authorization, or external persistence. Types do not establish those facts.
 - Abstraction level: is the code mixing high-level orchestration with low-level detail?
 - Coupling: does this change introduce dependencies that will make future changes harder?
 - Data model fit: do the data structures match the actual access patterns?
@@ -44,7 +44,7 @@ Don't penalize simple code for lacking abstraction. Premature abstraction is wor
 
 ## Verification
 
-Can you tell that this code works from reading it?
+What evidence establishes that this code meets its requirements?
 
 - Are there tests? Do they test behavior or implementation details?
 - Are there assertions/invariants that would catch regressions?

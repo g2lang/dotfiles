@@ -1,0 +1,5 @@
+interface:
+  display_name: "Handoff Note"
+  short_description: "Write a continuation note without starting another agent"
+policy:
+  allow_implicit_invocation: false

@@ -1,77 +1,20 @@
-# Good and Bad Tests
+# Choosing test assertions
 
-## Good Tests
+The [behavioral-testing principle](../principle-test-behavior-not-implementation/SKILL.md) is the shared reference. Assert the contract at the interface whose behavior matters.
 
-**Integration-style**: Test through real interfaces, not mocks of internal parts.
+Good examples include:
 
-```typescript
-// GOOD: Tests observable behavior
-test("user can checkout with valid cart", async () => {
-  const cart = createCart();
-  cart.add(product);
-  const result = await checkout(cart, paymentMethod);
-  expect(result.status).toBe("confirmed");
-});
-```
+- Retrieving a record after creating it when retrieval is the user's contract.
+- Checking durable rows after restarting a writer when durability is the contract.
+- Asserting that a cached request sends no additional request to an external provider. Pair it with a case that does send a request so the test proves it can observe one.
+- Checking that an interval operation preserves a mathematical property across generated inputs.
+- Checking a calculated value against an independently worked example, not the same calculation copied into the test.
+- Checking a stable error category that callers branch on.
 
-Characteristics:
+A test is coupled to implementation when it asserts which private helper ran, observes intermediate state no consumer can see, or breaks after a refactor that preserves every promised behavior.
 
-- Tests behavior users/callers care about
-- Uses public API only
-- Survives internal refactors
-- Describes WHAT, not HOW
-- One logical assertion per test
+The syntax of an assertion does not decide its value. A provider-call count can establish behavior; an internal-helper-call count usually does not. Database inspection can establish a persistence guarantee; inspecting an incidental private schema in a client-ergonomics test usually does not.
 
-## Bad Tests
+Keep lower-level tests when they establish properties the higher-level tests do not. Replace or delete redundant tests based on what they prove, not their position in the module hierarchy.
 
-**Implementation-detail tests**: Coupled to internal structure.
-
-```typescript
-// BAD: Tests implementation details
-test("checkout calls paymentService.process", async () => {
-  const mockPayment = jest.mock(paymentService);
-  await checkout(cart, payment);
-  expect(mockPayment.process).toHaveBeenCalledWith(cart.total);
-});
-```
-
-Red flags:
-
-- Mocking internal collaborators
-- Testing private methods
-- Asserting on call counts/order
-- Test breaks when refactoring without behavior change
-- Test name describes HOW not WHAT
-- Verifying through external means instead of interface
-
-```typescript
-// BAD: Bypasses interface to verify
-test("createUser saves to database", async () => {
-  await createUser({ name: "Alice" });
-  const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
-  expect(row).toBeDefined();
-});
-
-// GOOD: Verifies through interface
-test("createUser makes user retrievable", async () => {
-  const user = await createUser({ name: "Alice" });
-  const retrieved = await getUser(user.id);
-  expect(retrieved.name).toBe("Alice");
-});
-```
-
-**Tautological tests**: Expected value restates the implementation, so the test passes by construction.
-
-```typescript
-// BAD: Expected value is recomputed the way the code computes it
-test("calculateTotal sums line items", () => {
-  const items = [{ price: 10 }, { price: 5 }];
-  const expected = items.reduce((sum, i) => sum + i.price, 0);
-  expect(calculateTotal(items)).toBe(expected);
-});
-
-// GOOD: Expected value is an independent, known literal
-test("calculateTotal sums line items", () => {
-  expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
-});
-```
+Use precise assertions. An empty result is correct when the contract requires no observations, but is a weak assertion if the test was supposed to prove successful retrieval. Derive expected values from requirements or independent fixtures.

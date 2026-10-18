@@ -1,22 +1,35 @@
 # Skill mechanics
 
-The skill-specific branch of [`writing-for-agents`](SKILL.md): what changes when the document is a skill (frontmatter, the invocation choice, and router skills). Everything else about writing it is the universal reference in `SKILL.md`.
+This is the skill-specific reference for [writing-for-agents](SKILL.md).
 
-## Invocation
+## Discovery, loading, and authority
 
-Two choices, trading the two loads:
+These are separate decisions:
 
-- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously, and other skills can reach it. You can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the human's. The description is the skill's top-level context pointer, forced to stay loaded at all times: permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: omit `disable-model-invocation`, and write a model-facing description carrying the trigger branches (the pointer-writing rules in `SKILL.md` apply in full).
-- A **user-invoked** skill strips the description from the agent's reach: only the human typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load: you are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing: a one-line summary, trigger lists stripped.
+- Automatic discovery lets an agent select a skill when its description matches the task.
+- Explicit loading reads a requested skill or a file referenced by an authorized workflow.
+- Authority comes from the current request and applicable instructions, not from reading a skill.
 
-Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+For automatically selectable guidance, omit `disable-model-invocation` and write a concrete description of the situations it handles. Selection is not guaranteed. Keep essential project requirements in the project's standing instructions and executable checks.
 
-Shared reference that two user-invoked skills both need can live in neither: with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
+For substantial user-initiated procedures, set `disable-model-invocation: true`. In clients that honor it, the skill is excluded from automatic selection but remains explicitly available. When `agents/openai.yaml` is present, keep `policy.allow_implicit_invocation` consistent with that choice. Client behavior can differ; verify discovery and explicit commands in the actual client after activation.
 
-## Splitting by invocation
+This flag is not filesystem access control. An authorized workflow can explicitly read a referenced file. That read must not accidentally start the referenced skill's entire procedure or broaden permissions. Separate coordinator instructions from worker references so a candidate worker does not launch another candidate set.
 
-The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split off a model-invoked skill when you have a distinct leading word that should trigger it on its own (a trigger word you actually use in your prompts), or another skill must reach it. You pay context load for the new always-loaded description, so that independent reach has to be worth it.
+## Portable references
 
-## Router skills
+Link local dependencies with relative Markdown paths from the containing file. Say to read and follow the relevant file instead of assuming an invocation tool exists. Keep required support files in the managed collection. Every local link must resolve after installation.
 
-When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the human can reach them.
+Use [the shared workflow policy](../orchestration/references/workflow-policy.md) for permissions and delegation. Load Orca's installed guide through the [orchestration stub](../orchestration/SKILL.md) or [CLI stub](../orca-cli/SKILL.md); do not duplicate its version-specific command catalog.
+
+## Scope and invocation
+
+A description should identify when the skill adds useful guidance, without matching every coding request. A reference skill should not secretly launch workers, rewrite files, or commit. State the side effects of a procedural skill and check that the caller authorized them.
+
+Explicit command names, directory names, frontmatter names, and client metadata should agree. Renaming a command must also update links and user documentation. Avoid duplicate names in different discovery locations.
+
+## Composition
+
+Use shared reference files for repeated guidance. One workflow should own each multi-step procedure. Other skills may link to that procedure, but reading a design or review reference must not recursively execute its coordinator.
+
+A router can recommend a command or read an explicitly authorized reference. It does not acquire permission to run every procedure it can name. Keep a clear stopping point and a concrete completion condition for each workflow.

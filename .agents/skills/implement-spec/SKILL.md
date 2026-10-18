@@ -1,40 +1,59 @@
 ---
 name: implement-spec
-description: "Implement the result of /to-spec and /to-tickets in code."
+description: Implement an approved specification through supervised Orca tasks, serial integration, and independent review. Establish delivery permissions before starting.
 disable-model-invocation: true
 ---
 
-You have been provided a spec. This spec should have tickets associated with it, describing how to implement the spec.
+# Implement a specification
 
-The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+Read the [workflow policy](../orchestration/references/workflow-policy.md), [project workflow](../to-tickets/references/project-workflow.md), and [orchestration](../orchestration/SKILL.md). Fetch the installed Orca guide and its coordinator, placement, and messaging references as needed. Do not copy a remembered command sequence over the installed guide.
 
-The goal is the entire spec implemented on a single **integration branch**, with every ticket resolved the way the issue tracker closes work.
+## 1. Establish scope and authority
 
-The tickets are not a list of steps. They are a **task graph** with blocking relationships between them. This means there is always a **frontier** of tickets which are ready to be grabbed.
+Read the approved specification, tickets, comments, project requirements, and working-tree status. Identify dependencies and acceptance checks. Stop for missing consequential decisions rather than guessing them during parallel implementation.
 
-Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: to the spec, tickets, research notes, and previous commits. Don't duplicate information already available via pointers.
+State the integration branch, its exact base revision, worker ownership, and delivery endpoint. This workflow needs permission to create branches, make task-scoped commits, and integrate them locally. If that authority is absent or expressly withheld, ask once before starting. Pushes, tracker writes, PR publication, target-branch merges, and worktree deletion are separate permissions. A request to run this workflow authorizes its bounded supervised workers unless the user restricts delegation.
 
-**Implementer subagents** should be run in the background where possible for maximum concurrency.
+Preserve existing work. Never reset a checkout onto a preferred base. Create an appropriate Orca-managed checkout when authorized, or ask its owner to resolve an unsuitable one.
 
-## Steps
+## 2. Build the execution graph
 
-1. Read the spec and tickets to understand the task graph.
+Use one coordinator-owned Orca Run. Map each ticket to an implementation Task and an integration-and-verification Task. Record the issue reference, Task IDs, active Dispatch, branch, base revision, and resulting commit in the run's working notes.
 
-2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, accessible by all future subagents. This lets **implementer subagents** focus on implementation rather than exploration.
+The dependency pattern is:
 
-3. Create the integration branch. If the issue tracker closes work through PRs, or the user asks for one, open a draft PR after the first merge in step 5 (a branch with no commits ahead of main can't open one), marked as closing the spec and tickets.
+- `build-A` produces a reviewed implementation candidate on its own branch.
+- `integrate-A` depends on `build-A`, incorporates its exact commit, and verifies the integration branch.
+- `build-B`, when it needs A, depends on `integrate-A`, not merely on `build-A`.
 
-4. Use **implementer subagents** to implement each ticket, each in its own worktree on its own branch. Each implementer subagent:
-   - confirms its worktree is based on the integration branch before starting, and resets onto it if not;
-   - calls the Skill tool with `tdd` to build the ticket;
-   - merges the integration branch tip into its own branch before reporting done
+An accepted worker completion automatically settles its Orca Task. Do not mark a build complete and then assume dependent work waits for a later merge. Encode that wait in the graph. If a candidate needs fixes, complete the correction before integration, or create an explicit correction prerequisite. Do not let an integration task report success while its acceptance checks fail.
 
-5. Once an **implementer subagent** completes, merge its work to the integration branch with a **merger subagent**.
+Only one integration owner may write the integration branch at a time. Add ordering dependencies between integration tasks or dispatch them serially. Keep the common implementation base current only after successful integration. Other implementation tasks may run concurrently when their inputs and ownership allow it.
 
-6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
+## 3. Dispatch implementation tasks
 
-7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single **implementer subagent**.
+Create isolated Orca worktrees when concurrent code, index, or build writes would conflict. Pass an explicit base ref at creation and verify the resolved revision before work begins. A new child workspace relationship alone does not prove its Git base.
 
-8. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
+Each brief contains the ticket, approved contracts, exact base, allowed files, relevant skills, checks, report path, and Git permissions. Workers use [tdd](../tdd/SKILL.md). They do not run this coordinator workflow, open local approval dialogs, start more workers, or merge into the integration branch.
 
-9. Clean up all **implementer subagent** worktrees.
+Each successful worker returns its exact commit, changed files, test commands and results, unresolved concerns, and report path. It follows the live Orca preamble for questions, follow-ups, and completion. Preserve failed attempts and their evidence; retry only through the installed recovery procedure.
+
+## 4. Integrate and verify serially
+
+The integration owner reads the candidate diff and tests, confirms the expected integration tip, incorporates the authorized commit, and runs relevant checks. Resolve conflicts within scope; ask before choosing between conflicting product contracts.
+
+Report the resulting integration commit and actual check results. Only successful integration-and-verification unlocks dependent builds. If incorporation succeeds but checks fail, record that state and repair or explicitly undo it within granted authority before accepting integration. Do not start dependents from a broken tip.
+
+## 5. Review the integrated result
+
+Use [interrogate](../interrogate/SKILL.md) against a fixed integration revision and the approved specification. Check missing requirements as well as defects and scope expansion.
+
+The coordinator evaluates findings before assigning fixes. Dispatch accepted fixes to the implementation owner; a review report alone does not authorize coordinator edits. Integrate fixes serially, rerun checks, and recheck affected findings against the new revision. Do not apply all reviewer suggestions indiscriminately.
+
+## 6. Deliver and settle
+
+Without publication permission, stop at an integrated and verified local branch. With permission, publish using the configured project workflow and [pr](../pr/SKILL.md). Mark review readiness only after the checks required for that state pass. Close tickets only at the project's agreed completion point. Never infer permission to merge the target branch from permission to open a PR.
+
+Process every expected Dispatch through accepted success or failure and the installed reuse, retention, or release procedure. Unknown liveness is not completion. Release archives the worker output and handles its owned execution resource; it does not authorize deleting a worktree. Preserve branches and unique work unless separate cleanup permission covers them.
+
+Report per ticket whether it is implemented, integrated and verified, published, or blocked. Include exact revisions, checks, unresolved issues, evidence locations, and worker disposition. A failed or blocked run is a valid outcome when reported accurately.

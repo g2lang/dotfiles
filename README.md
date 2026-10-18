@@ -86,8 +86,11 @@ To manage a new skill, add `.agents/skills/<name>/SKILL.md` and any supporting
 files, run `just test-agents` and `just check`, then activate when ready with
 `just switch`. Edit managed files here, not through their installed symlinks.
 No authentication, sessions, installer state, or mutable agent settings are
-managed. See the [agent guide](docs/agents.md) for migration, conflicts,
-third-party skills, and adding another agent.
+managed. The shared workflow policy defines permissions and Orca ownership;
+engineering principles load on demand while substantial procedures remain
+explicit. `handoff-note` writes a continuation document without starting an
+agent. See the [agent guide](docs/agents.md) for workflow composition, validation,
+migration, conflicts, third-party skills, and adding another agent.
 
 ## SSH client configuration
 
@@ -127,7 +130,7 @@ just status         # Review existing changes and untracked files
 just check          # Fast whitespace, shell syntax, and Nix evaluation checks
 just test-terminal  # Focused terminal regression tests
 just test-nvim      # Focused Neovim regression test
-just test-agents    # Shared instructions, skill metadata, and Home Manager wiring
+just test-agents    # Skill references, invocation policies, and Home Manager wiring
 just verify         # Run checks and all test suites
 just plan           # Preview required builds and downloads
 just build          # Build NixOS + Home Manager into ./result

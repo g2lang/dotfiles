@@ -1,20 +1,20 @@
-# Architect runner prompt
+# Design candidate worker brief
 
-The orchestrator passes this file through to every parallel candidate runner during Phase B and fills in the variable inputs around it: the task, the Phase A grounding artifacts, the isolated working directory, and the path to write outputs. The working directory is a git worktree when available, otherwise a per-runner subdirectory under the sketch dir. What matters is independence between candidates.
+The coordinator supplies the requirements, approved decisions, source snapshot, design emphasis, allowed experiments, and a unique report path.
 
-You are producing one candidate design in architect's parallel exploration. Read the **architect** skill in full first. That's the workflow you're inside. Output a candidate design package: type sketch, function signatures, module map, and prose rationale shaped per [`rationale-template.md`](rationale-template.md).
+You produce one candidate design only. Do not run the coordinator's workflow, delegate, implement product code, commit, publish, or change shared files. Follow the live Orca preamble for questions and completion.
 
-Apply the following discipline. The orchestrator compares candidates on these axes to pick a base.
+Read [codebase-design](../../codebase-design/SKILL.md) and [design-red-flags.md](design-red-flags.md). Use [domain-modeling](../../domain-modeling/SKILL.md) as a reference if terminology is unresolved, but propose glossary changes in your report rather than editing shared documents.
 
-- Caller's usage first. Write the README-style usage and two or three real call sites before the types, then derive the type sketch from them. The usage is the spec. The two must agree, so reconcile the sketch to the usage, not the reverse.
-- Data structures first. Get the core types right and the code becomes obvious. Trace each dominant access pattern through the proposed structure. If the answer is "we'll add a map / index / cache later," the structure is wrong.
-- Interface depth. Compare the capability hidden behind the public surface relative to the size of that surface. Prefer a simple interface that pulls complexity into the callee, even when the implementation becomes less simple. Do not put transport or wire types on the public API. Parse into domain types behind the interface.
-- Shared state: if two actors might both write, ask "what happens?" If the answer isn't "nothing," default to per-actor state with a merge at the read boundary, per the **separate-before-serializing-shared-state** principle skill.
-- Make boundaries visible. `not implemented` errors for bodies, `// TODO` pseudocode for tricky logic, doc comments stating intent and invariants. A reader should trace data from input to output by reading types and signatures alone.
-- Encode invariants in types: hard-to-misuse types > runtime checks > prose comments, per the **encode-lessons-in-structure** principle skill.
-- Validate at boundaries, trust types inside, per the **boundary-discipline** principle skill. Business logic as pure functions. The shell stays thin.
-- Single source of truth per invariant. Derive instead of sync.
-- Idempotent state transitions where applicable, per the **make-operations-idempotent** principle skill. Ask what happens if the operation runs twice or crashes halfway.
-- Short call chains. If tracing the flow needs more than three files, flatten the hierarchy, per the **laziness-protocol** and **minimize-reader-load** principle skills.
+Your report contains:
 
-You are one of the parallel runners, each on a different model. Produce the best design your model can make. Don't hedge against the others. Differences between candidates are the signal used to pick a base and graft. Converging on a safe-looking middle defeats the exploration.
+1. Realistic caller examples before types or signatures.
+2. The proposed data types, operations, errors, and invariants.
+3. Ownership of mutable state and behavior under concurrent use.
+4. External dependencies and how to test the relevant behavior.
+5. What the interface hides and what callers must still know.
+6. Costs, rejected alternatives, open questions, and evidence for factual claims.
+
+Use [type discipline](../../principle-type-system-discipline/SKILL.md), [idempotency](../../principle-make-operations-idempotent/SKILL.md), and [reader load](../../principle-minimize-reader-load/SKILL.md) where relevant. Types do not prove that a lease is current or that an external operation succeeded. Keep runtime checks for conditions that can change.
+
+Sketches are illustrative, not compiled implementations, unless an authorized experiment actually compiled them. Record any experiment and its result. Return the artifact path and explicit task outcome through the live worker completion protocol.

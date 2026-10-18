@@ -1,0 +1,5 @@
+interface:
+  display_name: "Correct"
+  short_description: "Propose enforceable fixes for recurring mistakes"
+policy:
+  allow_implicit_invocation: false

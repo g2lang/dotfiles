@@ -1,38 +1,33 @@
 ---
 name: tdd
-description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
+description: Build features or fix bugs through small test-first increments. Use when implementing specified behavior, regression tests, or integration tests.
 ---
 
-# Test-Driven Development
+# Test-driven development
 
-TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle: consult them before and during the loop, not after.
+Use [behavioral testing](../principle-test-behavior-not-implementation/SKILL.md) as the definition of a useful test. This skill defines the implementation sequence. Read [tests.md](tests.md) and [mocking.md](mocking.md) when choosing assertions or dependencies.
 
-When exploring the codebase, read `GLOSSARY.md` (if it exists) so test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
+## Establish the contract
 
-## What a good test is
+Read the task, relevant project requirements, and existing tests. Identify the behavior and the interface through which it can be exercised. Use [codebase-design](../codebase-design/SKILL.md) if the interface itself needs design.
 
-Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification: "user can checkout with valid cart" tells you exactly what capability exists, and it survives refactors because it doesn't care about internal structure.
+Confirm consequential new behavior or public contracts before implementing them. Reuse already approved decisions; do not ask for permission before every routine test. A dispatched worker routes unresolved decisions through its live Orca ask mechanism under the [workflow policy](../orchestration/references/workflow-policy.md), rather than opening a separate user interview.
 
-See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+Choose the testing levels needed for the behavior. Focused property or numerical tests, persistence tests, and client tests can prove different requirements. Tests must exercise real behavior at the relevant interface; they need not all start at the application's outermost entry point.
 
-## Seams: where tests go
+## Work in verified increments
 
-A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
+1. Choose one concrete behavior and an expected result independent of the implementation.
+2. Add the smallest useful test and run it before changing the implementation. Confirm that it fails for the intended reason, not an unrelated setup failure.
+3. Implement enough behavior to satisfy the test and the established contract.
+4. Run the focused test and relevant nearby checks.
+5. Refactor while tests pass when it improves the implementation without changing behavior. Keep unrelated cleanup out of scope.
+6. Repeat, then run the broader project checks before reporting completion.
 
-**Test only at pre-agreed seams.** Before writing any test, write down the seams under test and confirm them with the user. No test is written at an unconfirmed seam. You can't test everything, so agreeing the seams up front is how testing effort lands on the critical paths and complex logic instead of every edge case.
+Do not write a large batch of speculative tests before learning from the first working increment. Do not weaken an assertion merely to make the current implementation pass.
 
-Ask: "What's the public interface, and which seams should we test?" Give each proposed seam a one-line note on what it catches and what it misses.
+When a regression requires integration infrastructure, use the project's isolated setup or establish the missing test capability within authorized scope. If a useful failing check cannot be run, report the reason and the closest executable evidence. Do not call an unexecuted test a demonstrated regression test.
 
-When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), call the Skill tool with "codebase-design" for the vocabulary. It is the shared source of the module, interface, depth, seam, adapter, leverage and locality terms, and it is a reference to consult, not a session to run.
+## Result
 
-## Anti-patterns
-
-- **Implementation-coupled**: mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
-- **Tautological**: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec.
-- **Horizontal slicing**: writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead: one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
-
-## Rules of the loop
-
-- **Red before green.** Write the failing test first, then only enough code to pass it. Don't anticipate future tests or add speculative features.
-- **One slice at a time.** One seam, one test, one minimal implementation per cycle.
-- **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
+Report the failing-before evidence, passing-after checks, broader checks, and remaining limitations. A passing worker-local test does not prove integration with other branches. Follow the assigned task's completion contract and do not commit, merge, or publish unless authorized.

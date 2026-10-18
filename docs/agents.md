@@ -12,7 +12,7 @@ After activation, the logical layout is:
 ~/.agents/
   AGENTS.md                     -> Nix-store-backed instructions
   skills/
-    dotfiles-workflow/           -> Nix-store-backed skill directory
+    codebase-design/             -> Nix-store-backed skill directory
     <unmanaged skills>/         # Existing installer-managed skills stay here
 ~/.pi/agent/AGENTS.md            -> ~/.agents/AGENTS.md
 ~/.codex/AGENTS.md               -> ~/.agents/AGENTS.md
@@ -27,10 +27,48 @@ instructions still belong in each project's own `AGENTS.md`.
 
 Pi and Codex both discover `~/.agents/skills/` natively, including symlinked skill
 directories. We do not also install these skills under their tool-specific skill
-paths, avoiding duplicate discovery. Pi supports `/skill:dotfiles-workflow`;
-Codex supports `$dotfiles-workflow` or its `/skills` selector. Reload Pi with
+paths, avoiding duplicate discovery. Pi supports `/skill:codebase-design`;
+Codex supports `$codebase-design` or its `/skills` selector. Reload Pi with
 `/reload` after activation; restart an agent if it has cached instructions or
 skill discovery.
+
+## Workflow composition
+
+The installed shared policy lives at
+`~/.agents/skills/orchestration/references/workflow-policy.md`. It distinguishes
+ordinary direct work, an Orca ownership handoff, and supervised Orca tasks.
+The Orca skill stubs load command and lifecycle instructions from the installed
+CLI. Do not copy those command catalogs into every workflow.
+
+Engineering principles and `benchmark-checklist` are automatically selectable.
+Design competitions, independent review, multi-ticket implementation, corrective
+cleanup, and planning/publication procedures remain explicit commands. Matching
+`agents/openai.yaml` policies keep explicit commands consistent for Codex.
+Selection is not guaranteed, and loading a skill never grants extra permissions.
+
+`handoff-note` replaces the former `handoff` command. It writes a private
+continuation note only. Use `orca-cli` to transfer ownership and `orchestration`
+to supervise work. Existing clients need a reload after activation to discover
+the renamed command.
+
+`implement-spec` separates implementation tasks from integration-and-verification
+tasks. Dependent builds wait for verified integration, not merely for a worker's
+completion. One owner writes the integration branch. Review is read-only unless
+fixes are separately assigned. Commit, publication, merge, and worktree-deletion
+permissions are established at the relevant phase.
+
+Project tracker configuration remains project-local. The shared reference at
+`~/.agents/skills/to-tickets/references/project-workflow.md` explains how planning
+skills use it without requiring another setup workflow. Generated verification skills
+belong in the target project's `.agents/skills/`, not the global collection.
+
+`just test-agents` checks metadata and Home Manager wiring, local Markdown
+references, unsupported tool assumptions, and invocation-policy agreement.
+The checks do not prove workflow behavior. After execution-policy changes, run a
+small explicitly authorized Orca review against fixed inputs, process questions
+and completion through the installed guide, inspect the report, and release the
+settled worker. Record blocked or unverified steps rather than treating static
+tests as a runtime proof. Keep run receipts and reports outside this checkout.
 
 ## Add, update, or remove a managed skill
 
@@ -53,6 +91,8 @@ no second manifest to edit.
    ```
 
 2. Include any required `scripts/`, `references/`, or `assets/` inside that skill
+   directory. Link dependencies using relative Markdown paths so tests can check
+   them. Resolve links from the file that contains them, not the working
    directory. Use lowercase names with single hyphens, at most 64 characters,
    and match the directory name to the frontmatter name. Keep descriptions on
    one line (at most 1024 characters).

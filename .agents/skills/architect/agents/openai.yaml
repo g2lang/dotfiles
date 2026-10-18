@@ -1,0 +1,5 @@
+interface:
+  display_name: "Architect"
+  short_description: "Compare interface designs before approved implementation"
+policy:
+  allow_implicit_invocation: false

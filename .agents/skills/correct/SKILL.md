@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Correct
 
-The operator keeps correcting agents in this repo for the same mistakes. Change the repo so the next agent can't make them.
+Identify recurring mistakes and propose enforceable corrections. Follow the [workflow policy](../orchestration/references/workflow-policy.md). Diagnose first, present the proposed scope, and implement only the corrections the user authorizes. Reading this skill after a correction does not authorize an unrelated repository cleanup.
 
 Assume every contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Design the repo so a change that looks right from one file is right for the whole repo.
 
@@ -23,10 +23,10 @@ First, read recent commits, reverts, review comments, agent instruction files, a
 
 ## Fix and prove
 
-Then fix the most frequent classes now, one commit each. Prove each new check fails on a real past mistake. Run the same command locally and in CI. Exceptions go on the offending line with a reason, an expiry date, and a human's approval.
+Implement the approved corrections in focused increments. Prove each new check fails on a real past mistake or a documented equivalent reproduction, then passes on the correction. Run local checks and report whether CI has actually run; do not imply that adding CI configuration means it passed. Commit only when requested. Exceptions need an explicit reason and an owner; use expiry dates where the project requires them.
 
 ## Keep the rule table
 
-Last, keep a table in the agent instruction file that pairs each rule with what enforces it. When the operator corrects you, fix the mistake and add the rule. If the rule was already there and nothing enforces it, that's a repeat, so fix it at the highest level in the same change. Drop a rule once its mistake can't happen.
+Record necessary judgment rules in the project's existing guidance. Prefer linking to the enforcing check over duplicating its implementation. A repeated correction is evidence for a proposed enforcement change, not permission to expand the current task. Remove obsolete guidance when the approved fix makes it unnecessary.
 
 **Reply:** each class with its evidence, the level you picked, and why a higher level didn't work.

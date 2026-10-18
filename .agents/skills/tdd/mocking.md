@@ -1,59 +1,11 @@
-# When to Mock
+# External dependencies in tests
 
-Mock at **system boundaries** only:
+Use real local implementations where practical, including isolated test databases when persistence semantics matter. Mock or fake external providers, clocks, randomness, or unavailable services at their actual interface.
 
-- External APIs (payment, email, etc.)
-- Databases (sometimes - prefer test DB)
-- Time/randomness
-- File system (sometimes)
+Pass dependencies explicitly when that makes behavior testable. Do not add a generic dependency framework solely to satisfy a testing convention.
 
-Don't mock:
+A fake establishes behavior only for the guarantees it models. An in-memory store does not prove a production database's transaction, concurrency, or durability behavior. Use integration tests for those guarantees.
 
-- Your own classes/modules
-- Internal collaborators
-- Anything you control
+Avoid mocks of private collaborators that pin internal call structure. Assertions about a real external contract, such as the request a provider receives, are valid under [behavioral testing](../principle-test-behavior-not-implementation/SKILL.md).
 
-## Designing for Mockability
-
-At system boundaries, design interfaces that are easy to mock:
-
-**1. Use dependency injection**
-
-Pass external dependencies in rather than creating them internally:
-
-```typescript
-// Easy to mock
-function processPayment(order, paymentClient) {
-  return paymentClient.charge(order.total);
-}
-
-// Hard to mock
-function processPayment(order) {
-  const client = new StripeClient(process.env.STRIPE_KEY);
-  return client.charge(order.total);
-}
-```
-
-**2. Prefer SDK-style interfaces over generic fetchers**
-
-Create specific functions for each external operation instead of one generic function with conditional logic:
-
-```typescript
-// GOOD: Each function is independently mockable
-const api = {
-  getUser: (id) => fetch(`/users/${id}`),
-  getOrders: (userId) => fetch(`/users/${userId}/orders`),
-  createOrder: (data) => fetch('/orders', { method: 'POST', body: data }),
-};
-
-// BAD: Mocking requires conditional logic inside the mock
-const api = {
-  fetch: (endpoint, options) => fetch(endpoint, options),
-};
-```
-
-The SDK approach means:
-- Each mock returns one specific shape
-- No conditional logic in test setup
-- Easier to see which endpoints a test exercises
-- Type safety per endpoint
+Keep default tests deterministic and isolated. Live provider calls, paid services, production data, and destructive fixtures require explicit project support and authorization. Use synthetic or sanitized fixtures without credentials or proprietary payloads.

@@ -39,6 +39,8 @@ If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The m
 
 Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
+Follow the [workflow policy](../orchestration/references/workflow-policy.md). Update documents only when the task authorizes them. A read-only review or research task proposes terminology changes in its report instead of editing shared files. Use existing project document locations before creating new ones.
+
 ## During the session
 
 ### Challenge against the glossary

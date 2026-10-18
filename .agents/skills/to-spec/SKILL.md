@@ -1,75 +1,27 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
+description: Turn an established discussion into a concise specification. Draft locally unless publication is requested and configured.
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
+# Write a specification
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+Read the [project workflow](../to-tickets/references/project-workflow.md) and [workflow policy](../orchestration/references/workflow-policy.md).
 
-## Process
+Synthesize the current discussion and relevant code. Use agreed domain vocabulary and existing decisions. Do not run another interview or invent answers. Mark unresolved questions and request a decision only when it blocks the requested deliverable.
 
-1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
+Describe testing at the levels needed to establish the contract. Prefer existing interfaces, but do not force all checks through one highest-level interface. A property test, a persistence test, and a client test may establish different requirements. Use the [behavioral-testing principle](../principle-test-behavior-not-implementation/SKILL.md).
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+Write a proportionate specification with these sections:
 
-Check with the user that these seams match their expectations.
+- Problem and intended users.
+- Observable behavior, with concrete caller examples where useful.
+- Invariants and data semantics.
+- Failure, retry, cancellation, and recovery behavior where applicable.
+- Approved implementation decisions and their reasons.
+- Acceptance criteria and verification strategy.
+- Exclusions and unresolved decisions.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+Include paths, revisions, or small type sketches when they make a decision precise. Label illustrative code and avoid duplicating implementation details that do not constrain the feature. Use only as many scenarios as the feature needs.
 
-<spec-template>
-
-## Problem Statement
-
-The problem that the user is facing, from the user's perspective.
-
-## Solution
-
-The solution to the problem, from the user's perspective.
-
-## User Stories
-
-A LONG, numbered list of user stories. Each user story should be in the format of:
-
-1. As an <actor>, I want a <feature>, so that <benefit>
-
-<user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
-</user-story-example>
-
-This list of user stories should be extremely extensive and cover all aspects of the feature.
-
-## Implementation Decisions
-
-A list of implementation decisions that were made. This can include:
-
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
-- Architectural decisions
-- Schema changes
-- API contracts
-- Specific interactions
-
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
-
-Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
-
-## Testing Decisions
-
-A list of testing decisions that were made. Include:
-
-- A description of what makes a good test (only test external behavior, not implementation details)
-- Which modules will be tested
-- Prior art for the tests (i.e. similar types of tests in the codebase)
-
-## Out of Scope
-
-A description of the things that are out of scope for this spec.
-
-## Further Notes
-
-Any further notes about the feature.
-
-</spec-template>
+Draft in the project's document location. Publish only when requested and the tracker is configured. Apply only agreed statuses or labels, and do not label unresolved work ready for implementation. Report the path or issue reference and any decisions still needed. Do not start implementation from this command.

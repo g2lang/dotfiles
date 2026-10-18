@@ -1,0 +1,5 @@
+interface:
+  display_name: "Blast Radius"
+  short_description: "Investigate change impact and prove safety assumptions"
+policy:
+  allow_implicit_invocation: false
